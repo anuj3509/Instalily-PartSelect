@@ -1,0 +1,92 @@
+[
+  {
+    "product": "Dishwasher",
+    "symptom": "Noisy",
+    "description": "Learn how to troubleshoot and repair a noisy dishwasher by the type of noise it makes, from the rattle of a pump housing or motor bushings, to a worn washer arm bearing.",
+    "percentage": "Reported By:   \n                                 29",
+    "parts": "Pump, Wash Arm Bearing Ring & Spray Arm Seal, Spray Arms",
+    "symptom_detail_url": "https://www.partselect.com/Repair/Dishwasher/Noisy/",
+    "difficulty": "REALLY EASY",
+    "repair_video_url": "https://www.youtube.com/watch?v=A8BeQ5qJyp4"
+  },
+  {
+    "product": "Dishwasher",
+    "symptom": "Leaking",
+    "description": "Diagnose the reason for your leaking dishwasher, from a worn pump and door seals, to a failed water inlet valve.",
+    "percentage": "Reported By:   \n                                 27",
+    "parts": "Pump, Door Gasket, Water Inlet Valve, Dispensers & Grommets, Spray Arm, Float & Float Switch, Hose Clamps & Hoses",
+    "symptom_detail_url": "https://www.partselect.com/Repair/Dishwasher/Leaking/",
+    "difficulty": "EASY",
+    "repair_video_url": "https://www.youtube.com/watch?v=hBAfmgORE6Q"
+  },
+  {
+    "product": "Dishwasher",
+    "symptom": "Will not start",
+    "description": "Learn how to fix a dishwasher that will not start, by checking a few key components, such as door latch switches, timers, electronic controls, motor relays and thermal fuses.",
+    "percentage": "Reported By:   \n                                 18",
+    "parts": "Door Latch Or Door Latch Switch, Timer Or Electronic Control, Selector Switch, Motor Start Relay, Thermal Fuse, Drive Motor",
+    "symptom_detail_url": "https://www.partselect.com/Repair/Dishwasher/Will-Not-Start/",
+    "difficulty": "EASY",
+    "repair_video_url": "https://www.youtube.com/watch?v=XgZq_VdXKiQ"
+  },
+  {
+    "product": "Dishwasher",
+    "symptom": "Door latch failure",
+    "description": "Find out how to fix a dishwasher door latch that isn't working properly by troubleshooting common repair parts like the door latch kit.",
+    "percentage": "Reported By:   \n                                 11",
+    "parts": "Door Latch Assembly",
+    "symptom_detail_url": "https://www.partselect.com/Repair/Dishwasher/Door-Latch-Failure/",
+    "difficulty": "REALLY EASY",
+    "repair_video_url": "https://www.youtube.com/watch?v=2Jy2G2FNSWg"
+  },
+  {
+    "product": "Dishwasher",
+    "symptom": "Not cleaning dishes properly",
+    "description": "Determine why your dishwasher will not clean properly by troubleshooting parts, like housing gaskets, spray arms, water deliver tubes and filters.",
+    "percentage": "Reported By:   \n                                 11",
+    "parts": "Upper Discharge Housing Gasket, Spray Arm, Docking Station, Chopper, Water Inlet Valve, Water Delivery Tube, Filters, Wash Spinner, Detergent Dispenser, Heating Element, Pump Impellers",
+    "symptom_detail_url": "https://www.partselect.com/Repair/Dishwasher/Not-Cleaning-Properly/",
+    "difficulty": "EASY",
+    "repair_video_url": "https://www.youtube.com/watch?v=9DqYkzF0qVM"
+  },
+  {
+    "product": "Dishwasher",
+    "symptom": "Not draining",
+    "description": "Figure out why your dishwasher will not drain by learning how to test a drain pump motor, timer and drain hose.",
+    "percentage": "Reported By:   \n                                 9",
+    "parts": "Piston & Nut Assembly, Drain Pump & Motor, Check Valve Flapper, Belt, Timer, Drain Hose",
+    "symptom_detail_url": "https://www.partselect.com/Repair/Dishwasher/Not-Draining/",
+    "difficulty": "EASY",
+    "repair_video_url": "https://www.youtube.com/watch?v=9DqYkzF0qVM"
+  },
+  {
+    "product": "Dishwasher",
+    "symptom": "Will not fill with water",
+    "description": "Diagnose why your dishwasher will not fill with water by checking and testing a water inlet valve, float switch and door switch.",
+    "percentage": "Reported By:   \n                                 2",
+    "parts": "Water Inlet Valve, Float, Float Switch, Door Switch",
+    "symptom_detail_url": "https://www.partselect.com/Repair/Dishwasher/Will-Not-Fill-Water/",
+    "difficulty": "EASY",
+    "repair_video_url": "https://www.youtube.com/watch?v=9UxFcTXFewQ"
+  },
+  {
+    "product": "Dishwasher",
+    "symptom": "Will not dispense detergent",
+    "description": "Learn how to repair a dishwasher that will not dispense detergent by testing the bi-metal release, wax motor and timer.",
+    "percentage": "Reported By:   \n                                 2",
+    "parts": "Detergent & Rinse Aid Dispensers, Rinse Aid Cap, Door Spring & Hinge Pin, Wax Motor, Bi-Metal Release, Timer",
+    "symptom_detail_url": "https://www.partselect.com/Repair/Dishwasher/Will-Not-Dispense-Detergent/",
+    "difficulty": "EASY",
+    "repair_video_url": "https://www.youtube.com/watch?v=q5B0FLR1WDM"
+  },
+  {
+    "product": "Dishwasher",
+    "symptom": "Not drying dishes properly",
+    "description": "Find out how to troubleshoot and repair a dishwasher that will not properly dry dishes, by checking heating elements, high limit thermostats and rinse aid dispensers.",
+    "percentage": "Reported By:   \n                                 1",
+    "parts": "Heating Element, High Limit Thermostat, Rinse Aid Dispenser",
+    "symptom_detail_url": "https://www.partselect.com/Repair/Dishwasher/Not-Drying-Properly/",
+    "difficulty": "EASY",
+    "repair_video_url": "https://www.youtube.com/watch?v=EhG4YLuCiXM"
+  }
+]

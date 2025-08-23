@@ -1,0 +1,425 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
+
+:root {
+  /* Light Mode - Apple-inspired with PartSelect branding */
+  --primary-blue: #007AFF;
+  --secondary-blue: #5AC8FA;
+  --accent-orange: #FF9500;
+  --partselect-blue: #0066CC;
+  --text-primary: #1D1D1F;
+  --text-secondary: #86868B;
+  --text-light: #AEAEB2;
+  --background-light: #F2F2F7;
+  --background-white: #FFFFFF;
+  --background-overlay: rgba(255, 255, 255, 0.8);
+  --border-light: #E5E5EA;
+  --border-medium: #D1D1D6;
+  --success-green: #34C759;
+  --error-red: #FF3B30;
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.08);
+  --border-radius: 16px;
+  --border-radius-sm: 12px;
+  --border-radius-lg: 24px;
+  --border-radius-xl: 32px;
+}
+
+[data-theme="dark"] {
+  /* Dark Mode - Clean ChatGPT-inspired with PartSelect branding */
+  --primary-blue: #1E90FF;
+  --secondary-blue: #4A9EFF;
+  --accent-orange: #FF9500;
+  --partselect-blue: #1E90FF;
+  --text-primary: #F1F1F1;
+  --text-secondary: #AAAAAA;
+  --text-light: #888888;
+  --background-light: #1c1c1d;
+  --background-white: #2A2A2B;
+  --background-overlay: rgba(28, 28, 29, 0.95);
+  --border-light: #2A2A2A;
+  --border-medium: #3A3A3A;
+  --success-green: #00C851;
+  --error-red: #FF4444;
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+* {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-size: 15px;
+  line-height: 1.47;
+  color: var(--text-primary);
+  background: var(--background-light);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background-light);
+  transition: background-color 0.3s ease;
+}
+
+/* Header Styles */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--background-overlay);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid var(--border-light);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.title-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.18;
+  letter-spacing: -0.011em;
+  transition: color 0.3s ease;
+}
+
+.app-subtitle {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.31;
+  transition: color 0.3s ease;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.phone-btn,
+.contact-us-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--background-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: var(--shadow-subtle);
+}
+
+.phone-btn:hover,
+.contact-us-btn:hover {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+  text-decoration: none;
+}
+
+.phone-btn svg,
+.contact-us-btn svg {
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.phone-btn:hover svg,
+.contact-us-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.dark-mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--background-white);
+  border: 0.5px solid var(--border-light);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: var(--shadow-subtle);
+}
+
+.dark-mode-toggle:hover {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.dark-mode-toggle:active {
+  transform: translateY(0px);
+  transition: all 0.1s ease;
+}
+
+.dark-mode-toggle svg {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.dark-mode-toggle:hover svg {
+  transform: rotate(180deg);
+}
+
+.status-indicator-bottom {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: var(--background-overlay);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-subtle);
+  z-index: 50;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.status-dot.healthy {
+  background-color: var(--success-green);
+  box-shadow: 0 0 6px rgba(52, 199, 89, 0.3);
+}
+
+.status-dot.connecting {
+  background-color: var(--accent-orange);
+  box-shadow: 0 0 6px rgba(255, 149, 0, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.status-dot.error {
+  background-color: var(--error-red);
+  box-shadow: 0 0 6px rgba(255, 59, 48, 0.3);
+}
+
+.status-text {
+  font-weight: 500;
+  letter-spacing: -0.008em;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  margin-top: 80px;
+  margin-bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+}
+
+/* Footer */
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--background-overlay);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 0.5px solid var(--border-light);
+  padding: 12px 32px;
+  text-align: center;
+  z-index: 100;
+}
+
+.app-footer p {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-light);
+  margin: 0;
+  letter-spacing: -0.003em;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 24px;
+    height: 70px;
+  }
+  
+  .logo {
+    height: 36px;
+  }
+  
+  .app-title {
+    font-size: 20px;
+  }
+  
+  .app-subtitle {
+    font-size: 12px;
+  }
+  
+  .header-controls {
+    gap: 12px;
+  }
+  
+  .phone-btn,
+  .contact-us-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .phone-btn svg,
+  .contact-us-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .dark-mode-toggle {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .status-indicator-bottom {
+    font-size: 12px;
+    padding: 6px 10px;
+    bottom: 20px;
+    left: 20px;
+  }
+  
+  .main-content {
+    margin-top: 70px;
+    margin-bottom: 45px;
+    padding: 0 16px;
+  }
+  
+  .app-footer {
+    padding: 10px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    padding: 0 20px;
+  }
+  
+  .logo-container {
+    gap: 12px;
+  }
+  
+  .app-title {
+    font-size: 18px;
+  }
+  
+  .app-subtitle {
+    font-size: 11px;
+  }
+  
+  .header-controls {
+    gap: 10px;
+  }
+  
+  .phone-btn,
+  .contact-us-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+    gap: 5px;
+  }
+  
+  .phone-btn svg,
+  .contact-us-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .dark-mode-toggle {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .dark-mode-toggle svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .status-indicator-bottom {
+    font-size: 11px;
+    padding: 5px 8px;
+    bottom: 16px;
+    left: 16px;
+  }
+  
+  .main-content {
+    padding: 0 12px;
+  }
+}
