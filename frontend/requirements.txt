@@ -1,0 +1,13 @@
+# Frontend Python requirements (if any Python tools are used)
+# Most frontend dependencies are managed via package.json
+
+# Environment configuration
+python-dotenv==1.0.0
+
+# If using Python for build scripts or testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Note: Frontend dependencies are primarily managed via:
+# - package.json (Node.js dependencies)
+# - npm/yarn for package management

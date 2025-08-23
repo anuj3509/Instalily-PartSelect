@@ -23,6 +23,18 @@
 - **Conversation Statistics** and management tools
 - **Multi-turn Conversations** with context preservation
 
+## User Interface
+
+![PartSelect AI Assistant Interface](interface.png)
+
+*Modern, user-friendly interface featuring categorized question suggestions, real-time chat capabilities, and quick access to customer service features*
+
+The interface includes:
+- **Smart Question Categories**: Part Search, Compatibility Check, and Troubleshooting
+- **Real-time Chat**: Interactive conversation with the AI assistant
+- **Quick Links**: Easy access to order tracking, returns, shipping, and warranty information
+- **Responsive Design**: Clean, modern UI optimized for both desktop and mobile use
+
 ## System Architecture
 
 ### High-Level Flow
@@ -58,16 +70,28 @@ The system uses a **dual-database approach** with **2 LLM calls** for optimal pe
 - **Vector Database**: ChromaDB with Voyage AI embeddings for semantic search
 - **Data Sources**: 10,000+ parts, 50+ repair guides, 200+ blog articles
 
+## Project Structure
 
+```
+Instalily-PartSelect/
+├── backend/           # FastAPI backend with RAG agents
+├── frontend/          # React frontend application
+├── scraping/          # Web scraping tools for data collection
+├── requirements.txt   # Main project dependencies
+├── requirements-dev.txt # Development dependencies
+└── README.md         # This file
+```
 
-## Quick Start
-
-### Prerequisites
+## Prerequisites
 
 - **Python 3.8+**
 - **Node.js 16+**
 - **SQLite 3.0+**
 - **API Keys**: DeepSeek API, Voyage AI API
+- **pip** (Python package manager)
+- **npm** or **yarn** (Node.js package manager)
+
+## Installation & Setup
 
 ### 1. Clone and Setup
 
@@ -79,28 +103,36 @@ cd Instalily-PartSelect
 # Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install backend dependencies
-cd backend
-pip install -r requirements.txt
-
-# Install frontend dependencies
-cd ../frontend
-npm install
 ```
 
-### 2. Environment Configuration
+### 2. Install Dependencies
 
 ```bash
-# Copy environment template
+# Install all Python dependencies
+pip install -r requirements.txt
+
+# Install development dependencies (optional)
+pip install -r requirements-dev.txt
+
+# Install frontend dependencies
+cd frontend
+npm install
+cd ..
+```
+
+### 3. Environment Configuration
+
+```bash
+# Copy environment template (if available)
 cp .env.example .env
 
 # Edit .env file with your API keys
 DEEPSEEK_API_KEY=your_deepseek_api_key
 VOYAGE_API_KEY=your_voyage_ai_api_key
+OPENAI_API_KEY=your_openai_key_here
 ```
 
-### 3. Database Setup
+### 4. Database Setup
 
 ```bash
 cd backend
@@ -112,7 +144,7 @@ python -c "from database.database_manager import PartSelectDatabase; db = PartSe
 python -c "from database.database_manager import PartSelectDatabase; db = PartSelectDatabase(); db.load_data_from_json()"
 ```
 
-### 4. Vector Database Setup
+### 5. Vector Database Setup
 
 ```bash
 cd backend
@@ -157,6 +189,30 @@ cd backend && python rag_main.py
 
 # Terminal 2: Frontend  
 cd frontend && npm start
+```
+
+## Development Setup
+
+### Code Quality Tools
+
+```bash
+# Format code
+black backend/
+isort backend/
+
+# Lint code
+flake8 backend/
+mypy backend/
+
+# Run tests
+pytest backend/
+```
+
+### Pre-commit Hooks
+
+```bash
+# Install pre-commit hooks
+pre-commit install
 ```
 
 ## Testing the System
@@ -213,14 +269,14 @@ cd frontend && npm start
    # Verify frontend API configuration in src/api/api.js
    ```
 
+5. **Import Errors**: Make sure you're in the correct virtual environment
+6. **Port Conflicts**: Change ports in uvicorn or npm start commands
 
+### Dependencies Issues
 
-
-
-
-
-
-
+- **ChromaDB**: May require specific Python version compatibility
+- **Playwright**: Requires browser installation (`playwright install`)
+- **SQLite**: Built-in to Python, no additional installation needed
 
 ## Support
 
@@ -231,4 +287,6 @@ For questions, issues, or contributions:
 - **Email**: [anujmpatel0000@gmail.com]
 
 ---
+
+**Note**: This project uses a dual-database approach with SQLite for fast queries and ChromaDB for semantic search, optimized for cost-effective AI responses with minimal LLM calls.
 
