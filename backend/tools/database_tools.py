@@ -9,7 +9,7 @@ from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 from pathlib import Path
 
-from ..database.database_manager import PartSelectDatabase
+from database.database_manager import PartSelectDatabase
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -91,7 +91,8 @@ class PartSelectDatabaseTools:
                     "image_url": part['image_url'],
                     "in_stock": part['in_stock'],
                     "installation_guide": part.get('installation_guide'),
-                    "install_video_url": part.get('install_video_url')
+                    "install_video_url": part.get('install_video_url'),
+                    "video_url": part.get('video_url')
                 }
                 formatted_results.append(formatted_part)
             
@@ -139,6 +140,7 @@ class PartSelectDatabaseTools:
                     "in_stock": part['in_stock'],
                     "installation_guide": part.get('installation_guide'),
                     "install_video_url": part.get('install_video_url'),
+                    "video_url": part.get('video_url'),
                     "specifications": part.get('specifications', {})
                 },
                 "message": f"Found details for part {part_number}"
@@ -173,7 +175,9 @@ class PartSelectDatabaseTools:
                     "brand": part['brand'],
                     "product_url": part['product_url'],
                     "model_number": part['model_number'],
-                    "appliance_type": part['appliance_type']
+                    "appliance_type": part['appliance_type'],
+                    "install_video_url": part.get('install_video_url'),
+                    "video_url": part.get('video_url')
                 }
                 formatted_results.append(formatted_part)
             
@@ -401,11 +405,11 @@ AVAILABLE_TOOLS = {
     },
     "get_part_details": {
         "function": get_part_details_tool,
-        "description": "Get detailed information about a specific part by part number",
+        "description": "Get detailed information about a specific part by part number. Use this for: specific part numbers (PS123, W10234, etc.), part installation questions, part specifications, pricing, and availability. This is the PRIMARY tool for part-specific queries.",
         "parameters": {
             "type": "object",
             "properties": {
-                "part_number": {"type": "string", "description": "Part number to lookup"}
+                "part_number": {"type": "string", "description": "Part number to lookup (e.g., PS11752778, W10234)"}
             },
             "required": ["part_number"]
         }
@@ -424,11 +428,11 @@ AVAILABLE_TOOLS = {
     },
     "search_repair_guides": {
         "function": search_repair_guides_tool,
-        "description": "Search for repair guides and troubleshooting information",
+        "description": "Search for repair guides and troubleshooting information. Use this for: appliance problems, symptoms, troubleshooting, repair procedures. DO NOT use for specific part numbers or part installation questions - use get_part_details instead.",
         "parameters": {
             "type": "object",
             "properties": {
-                "symptom": {"type": "string", "description": "Problem description or symptom"},
+                "symptom": {"type": "string", "description": "Problem description or symptom (e.g., 'leaking', 'not cooling', 'door won't close')"},
                 "appliance_type": {"type": "string", "description": "Type of appliance (refrigerator/dishwasher)"},
                 "limit": {"type": "integer", "description": "Maximum number of results", "default": 10}
             },

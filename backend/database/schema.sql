@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS parts (
     availability TEXT,
     in_stock BOOLEAN DEFAULT TRUE,
     specifications TEXT, -- JSON string
+    data_type TEXT DEFAULT 'json_part', -- 'json_part', 'csv_part', etc.
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

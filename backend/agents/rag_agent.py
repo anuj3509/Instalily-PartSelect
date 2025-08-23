@@ -18,8 +18,7 @@ project_root = current_dir.parent.parent
 env_path = project_root / '.env'
 load_dotenv(env_path)
 
-from ..tools.database_tools import AVAILABLE_TOOLS
-from .models import AgentState
+from tools.database_tools import AVAILABLE_TOOLS
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -55,8 +54,10 @@ You have access to several database tools that provide REAL PartSelect data:
    - Always check real inventory and prices
 
 2. **get_part_details** - Get detailed info about a specific part number
-   - Use when user mentions a specific part number
-   - Provides real URLs, specifications, installation guides
+   - Use when user mentions a specific part number (PS123, W10234, etc.)
+   - Use for part installation questions, specifications, pricing, availability
+   - Provides real URLs, specifications, installation guides, and video links
+   - This is the PRIMARY tool for part-specific queries
 
 3. **search_compatible_parts** - Find parts for specific appliance models
    - Use when user provides model number
@@ -105,8 +106,11 @@ For **Part Search** queries:
 **Description:**
 [Real product description]
 
+**Installation Video:**
+[Include YouTube video link if available]
+
 **Installation:**
-[Real installation guidance or video link if available]
+[Real installation guidance if available]
 
 **Next Step:**
 [Order link or compatibility check suggestion]
@@ -150,11 +154,14 @@ For **Compatibility** queries:
 
 **IMPORTANT RULES:**
 1. **Always call tools first** before responding to part/repair queries
-2. **Use ONLY real data** from tool responses
-3. **Never generate fake URLs, prices, or part numbers**
-4. **Stay within refrigerator/dishwasher domain**
-5. **Be helpful but accurate** - if tools return no results, say so
-6. **Provide actionable next steps** with real links when available
+2. **For specific part numbers (PS123, W10234, etc.), ALWAYS use get_part_details tool first**
+3. **Use ONLY real data** from tool responses
+4. **Never generate fake URLs, prices, or part numbers**
+5. **Stay within refrigerator/dishwasher domain**
+6. **Be helpful but accurate** - if tools return no results, say so
+7. **Provide actionable next steps** with real links when available
+8. **CRITICAL: After tool execution, generate ONLY clean, human-readable text - NEVER include tool call syntax, tokens, or internal formatting**
+9. **CRITICAL: Your final response must be natural language that a customer can read and understand**
 
 **Out of Scope Responses:**
 If asked about other appliances or non-repair topics, politely redirect:
@@ -170,15 +177,39 @@ Remember: You're representing PartSelect, so maintain professionalism and accura
             # Build conversation context
             messages = [{"role": "system", "content": self.system_prompt}]
             
-            # Add conversation history if provided
+            # Add conversation history if provided - ensure all messages are serializable
             if conversation_history:
-                messages.extend(conversation_history)
+                for msg in conversation_history:
+                    if isinstance(msg, dict) and "role" in msg and "content" in msg:
+                        # Ensure content is a string
+                        content = str(msg.get("content", ""))
+                        messages.append({
+                            "role": msg["role"],
+                            "content": content
+                        })
+                    else:
+                        logger.warning(f"Skipping non-serializable message: {type(msg)}")
             
             # Add current user query
-            messages.append({"role": "user", "content": user_query})
+            messages.append({"role": "user", "content": str(user_query)})
+            
+            # Validate all messages are serializable
+            for i, msg in enumerate(messages):
+                if not isinstance(msg, dict) or "role" not in msg or "content" not in msg:
+                    logger.error(f"Invalid message format at index {i}: {msg}")
+                    raise ValueError(f"Invalid message format: {msg}")
+                if not isinstance(msg["content"], str):
+                    msg["content"] = str(msg["content"])
             
             # Create tools for OpenAI function calling
             tools = self._create_openai_tools()
+            
+            # Log the messages being sent to LLM
+            try:
+                logger.info(f"🔍 Sending to LLM - Messages: {json.dumps(messages, indent=2)}")
+            except:
+                logger.info(f"🔍 Sending to LLM - Messages count: {len(messages)}")
+            logger.info(f"🔧 Available tools: {[tool['function']['name'] for tool in tools]}")
             
             # Make initial request with tools
             response = await self.client.chat.completions.create(
@@ -190,10 +221,30 @@ Remember: You're representing PartSelect, so maintain professionalism and accura
                 max_tokens=2000
             )
             
+            # Log the LLM response
+            logger.info(f"🤖 LLM Response: {response.choices[0].message.content}")
+            if response.choices[0].message.tool_calls:
+                logger.info(f"🔧 Tool calls requested: {[tc.function.name for tc in response.choices[0].message.tool_calls]}")
+            
             # Handle tool calls
             if response.choices[0].message.tool_calls:
-                # Execute tool calls
-                messages.append(response.choices[0].message)
+                # Execute tool calls - extract only serializable content
+                assistant_message = {
+                    "role": "assistant",
+                    "content": response.choices[0].message.content or "",
+                    "tool_calls": [
+                        {
+                            "id": tc.id,
+                            "type": "function",
+                            "function": {
+                                "name": tc.function.name,
+                                "arguments": tc.function.arguments
+                            }
+                        }
+                        for tc in response.choices[0].message.tool_calls
+                    ]
+                }
+                messages.append(assistant_message)
                 
                 for tool_call in response.choices[0].message.tool_calls:
                     tool_name = tool_call.function.name
@@ -204,14 +255,29 @@ Remember: You're representing PartSelect, so maintain professionalism and accura
                     # Execute the tool
                     if tool_name in AVAILABLE_TOOLS:
                         tool_function = AVAILABLE_TOOLS[tool_name]["function"]
+                        logger.info(f"🔧 Executing tool {tool_name} with args: {tool_args}")
                         tool_result = tool_function(**tool_args)
+                        logger.info(f"🔧 Tool {tool_name} result: {tool_result[:500]}...")
                         
-                        # Add tool result to conversation
+                        # Add tool result to conversation - ensure it's a string
+                        tool_content = str(tool_result) if tool_result else ""
                         messages.append({
                             "role": "tool",
                             "tool_call_id": tool_call.id,
-                            "content": tool_result
+                            "content": tool_content
                         })
+                
+                # Log messages before final response
+                try:
+                    logger.info(f"🔍 Messages before final response: {json.dumps(messages, indent=2)}")
+                except:
+                    logger.info(f"🔍 Messages before final response count: {len(messages)}")
+                
+                # Add instruction for clean response generation
+                messages.append({
+                    "role": "user",
+                    "content": "Now generate a clean, human-readable response based on the tool results. DO NOT include any tool call syntax, tokens, or internal formatting. Write as if you're speaking directly to a customer."
+                })
                 
                 # Get final response after tool execution
                 final_response = await self.client.chat.completions.create(
@@ -222,19 +288,60 @@ Remember: You're representing PartSelect, so maintain professionalism and accura
                 )
                 
                 final_content = final_response.choices[0].message.content
+                
+                # Clean up any remaining tokens or internal formatting
+                if final_content:
+                    # Remove any tool call syntax or tokens
+                    final_content = final_content.replace("REDACTED_SPECIAL_TOKEN", "")
+                    final_content = final_content.replace("<|tool_calls_begin|>", "")
+                    final_content = final_content.replace("<|tool_calls_end|>", "")
+                    final_content = final_content.replace("<|tool_call_begin|>", "")
+                    final_content = final_content.replace("<|tool_call_end|>", "")
+                    final_content = final_content.replace("<|tool_sep|>", "")
+                    
+                    # Clean up any remaining formatting artifacts
+                    final_content = final_content.strip()
+                    
+                    # If content is empty after cleaning, provide a fallback
+                    if not final_content or len(final_content.strip()) < 10:
+                        final_content = "I apologize, but I encountered an issue generating the response. Please try asking your question again."
+                
+                logger.info(f"🤖 Final LLM Response (cleaned): {final_content}")
             else:
                 # No tools needed, use direct response
-                final_content = response.choices[0].message.content
+                direct_content = response.choices[0].message.content
+                
+                # Clean up any tokens or internal formatting
+                if direct_content:
+                    direct_content = direct_content.replace("REDACTED_SPECIAL_TOKEN", "")
+                    direct_content = direct_content.replace("<|tool_calls_begin|>", "")
+                    direct_content = direct_content.replace("<|tool_calls_end|>", "")
+                    direct_content = direct_content.replace("<|tool_call_begin|>", "")
+                    direct_content = direct_content.replace("<|tool_call_end|>", "")
+                    direct_content = direct_content.replace("<|tool_sep|>", "")
+                    direct_content = direct_content.strip()
+                
+                logger.info(f"🤖 No tools needed, direct response (cleaned): {direct_content}")
+                final_content = direct_content
+            
+            logger.info(f"✅ Returning final response: {final_content[:200]}...")
+            
+            # Ensure tools_used is properly extracted
+            tools_used = []
+            if response.choices[0].message.tool_calls:
+                tools_used = [tc.function.name for tc in response.choices[0].message.tool_calls]
             
             return {
                 "success": True,
                 "response": final_content,
-                "tools_used": [tc.function.name for tc in (response.choices[0].message.tool_calls or [])],
+                "tools_used": tools_used,
                 "message": "Query processed successfully"
             }
             
         except Exception as e:
+            import traceback
             logger.error(f"Error processing query: {e}")
+            logger.error(f"Full traceback: {traceback.format_exc()}")
             return {
                 "success": False,
                 "response": "I apologize, but I encountered an error processing your request. Please try again or contact customer service at 1-866-319-8402.",

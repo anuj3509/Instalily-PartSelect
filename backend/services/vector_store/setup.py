@@ -253,6 +253,93 @@ class PartSelectVectorStore:
         
         logger.info(f"Ingested {len(documents)} blogs into vector store")
     
+    def ingest_csv_parts_data(self, csv_file_path: str):
+        """Ingest parts data from CSV file"""
+        logger.info(f"Ingesting CSV parts data from {csv_file_path}")
+        
+        # Check if collection already has CSV data
+        existing_count = self.parts_collection.count()
+        if existing_count > 0:
+            logger.info(f"Parts collection already contains {existing_count} items, adding CSV data...")
+            
+        # Read CSV file
+        df = pd.read_csv(csv_file_path)
+        logger.info(f"Loaded {len(df)} rows from CSV")
+        
+        documents = []
+        metadatas = []
+        ids = []
+        
+        for i, row in df.iterrows():
+            # Create rich document text for embedding
+            doc_text = self._create_csv_parts_document_text(row)
+            documents.append(doc_text)
+            
+            # Store metadata for retrieval
+            metadata = {
+                "part_number": str(row.get("part_number", "")),
+                "name": str(row.get("name", "")),
+                "manufacturer": str(row.get("manufacturer", "")),
+                "price": float(row.get("price", 0.0)) if pd.notna(row.get("price")) else 0.0,
+                "installation_difficulty": str(row.get("installation_difficulty", "")),
+                "installation_time": str(row.get("installation_time", "")),
+                "product_url": str(row.get("product_url", "")),
+                "video_url": str(row.get("video_url", "")),
+                "product_types": str(row.get("product_types", "")),
+                "symptoms": str(row.get("symptoms", "")),
+                "availability": str(row.get("availability", "")),
+                "data_type": "csv_part"
+            }
+            metadatas.append(metadata)
+            ids.append(f"csv_part_{i}")
+        
+        # Add to collection in batches
+        batch_size = 100
+        for i in range(0, len(documents), batch_size):
+            end_idx = min(i + batch_size, len(documents))
+            batch_docs = documents[i:end_idx]
+            batch_metas = metadatas[i:end_idx]
+            batch_ids = ids[i:end_idx]
+            
+            self.parts_collection.add(
+                documents=batch_docs,
+                metadatas=batch_metas,
+                ids=batch_ids
+            )
+        
+        logger.info(f"Ingested {len(documents)} CSV parts into vector store")
+    
+    def _create_csv_parts_document_text(self, row: pd.Series) -> str:
+        """Create document text for CSV parts embedding"""
+        text_parts = []
+        
+        # Core part information
+        if pd.notna(row.get("name")):
+            text_parts.append(f"Part: {row['name']}")
+        if pd.notna(row.get("part_number")):
+            text_parts.append(f"Part Number: {row['part_number']}")
+        if pd.notna(row.get("manufacturer")):
+            text_parts.append(f"Manufacturer: {row['manufacturer']}")
+        
+        # Functional information
+        if pd.notna(row.get("symptoms")):
+            text_parts.append(f"Symptoms: {row['symptoms']}")
+        
+        if pd.notna(row.get("product_types")):
+            text_parts.append(f"Product types: {row['product_types']}")
+        
+        # Installation information
+        if pd.notna(row.get("installation_difficulty")):
+            text_parts.append(f"Installation difficulty: {row['installation_difficulty']}")
+        if pd.notna(row.get("installation_time")):
+            text_parts.append(f"Installation time: {row['installation_time']}")
+        
+        # Additional information
+        if pd.notna(row.get("availability")):
+            text_parts.append(f"Availability: {row['availability']}")
+        
+        return " | ".join(text_parts)
+    
     def _create_parts_document_text(self, part: Dict[str, Any]) -> str:
         """Create rich document text for parts embedding"""
         text_parts = []
@@ -322,11 +409,17 @@ def main():
     parts_file = data_dir / "all_parts.json"
     repairs_file = data_dir / "all_repairs.json"
     blogs_file = data_dir / "partselect_blogs.json"
+    csv_parts_file = data_dir / "all_partselect_parts.csv"
     
     if parts_file.exists():
         vector_store.ingest_parts_data(str(parts_file))
     else:
         logger.warning(f"Parts file not found: {parts_file}")
+    
+    if csv_parts_file.exists():
+        vector_store.ingest_csv_parts_data(str(csv_parts_file))
+    else:
+        logger.warning(f"CSV parts file not found: {csv_parts_file}")
     
     if repairs_file.exists():
         vector_store.ingest_repairs_data(str(repairs_file))

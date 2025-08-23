@@ -330,6 +330,13 @@ class PartSelectDatabase:
             if blogs_file.exists():
                 self._load_blogs_data(str(blogs_file))
             
+            # Load CSV parts data
+            csv_parts_file = data_dir / "all_partselect_parts.csv"
+            if csv_parts_file.exists():
+                self.load_csv_parts_data(str(csv_parts_file))
+            else:
+                logger.warning(f"CSV parts file not found: {csv_parts_file}")
+            
             logger.info("Data loading completed successfully")
             
         except Exception as e:
@@ -365,8 +372,8 @@ class PartSelectDatabase:
                     INSERT OR REPLACE INTO parts 
                     (part_number, name, description, price, brand, category, 
                      image_url, product_url, installation_guide, install_video_url, 
-                     in_stock, specifications)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     in_stock, specifications, data_type)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, [
                     part.get('part_number'),
                     part.get('name'),
@@ -379,7 +386,8 @@ class PartSelectDatabase:
                     part.get('installation_guide'),
                     part.get('install_video_url'),
                     part.get('in_stock', True),
-                    json.dumps(part.get('specifications', {}))
+                    json.dumps(part.get('specifications', {})),
+                    'json_part'  # data_type
                 ])
                 
                 # Insert compatibility data
@@ -424,8 +432,8 @@ class PartSelectDatabase:
                     (part_number, name, price, brand, manufacturer, manufacturer_id, 
                      category, product_url, installation_difficulty, installation_time, 
                      video_url, symptoms, product_types, replacement_parts, 
-                     availability, in_stock, specifications)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     availability, in_stock, specifications, data_type)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, [
                     part.get('part_number'),
                     part.get('name'),
@@ -448,7 +456,8 @@ class PartSelectDatabase:
                         'manufacturer_id': part.get('manufacturer_id'),
                         'category': category,
                         'url': part.get('product_url')
-                    })
+                    }),
+                    'json_part'  # data_type
                 ])
             
             conn.commit()
@@ -506,6 +515,57 @@ class PartSelectDatabase:
             
             conn.commit()
             logger.info(f"Loaded {len(blogs_data)} blog articles into database")
+    
+    def load_csv_parts_data(self, csv_file_path: str):
+        """Load parts data from CSV file into the database"""
+        import csv
+        import pandas as pd
+        
+        logger.info(f"Loading CSV parts data from {csv_file_path}")
+        
+        try:
+            # Read CSV file
+            df = pd.read_csv(csv_file_path)
+            logger.info(f"Loaded {len(df)} rows from CSV")
+            
+            with self.get_connection() as conn:
+                # Clear existing CSV parts to avoid duplicates
+                conn.execute("DELETE FROM parts WHERE data_type = 'csv_part'")
+                
+                for i, row in df.iterrows():
+                    # Handle missing values
+                    part_number = str(row.get('part_number', f'csv_part_{i}')) if pd.notna(row.get('part_number')) else f'csv_part_{i}'
+                    name = str(row.get('name', '')) if pd.notna(row.get('name')) else ''
+                    manufacturer = str(row.get('manufacturer', '')) if pd.notna(row.get('manufacturer')) else ''
+                    price = float(row.get('price', 0.0)) if pd.notna(row.get('price')) else 0.0
+                    installation_difficulty = str(row.get('installation_difficulty', '')) if pd.notna(row.get('installation_difficulty')) else ''
+                    installation_time = str(row.get('installation_time', '')) if pd.notna(row.get('installation_time')) else ''
+                    symptoms = str(row.get('symptoms', '')) if pd.notna(row.get('symptoms')) else ''
+                    product_types = str(row.get('product_types', '')) if pd.notna(row.get('product_types')) else ''
+                    replacement_parts = str(row.get('replacement_parts', '')) if pd.notna(row.get('replacement_parts')) else ''
+                    availability = str(row.get('availability', '')) if pd.notna(row.get('availability')) else ''
+                    video_url = str(row.get('video_url', '')) if pd.notna(row.get('video_url')) else ''
+                    product_url = str(row.get('product_url', '')) if pd.notna(row.get('product_url')) else ''
+                    
+                    # Insert into database
+                    conn.execute("""
+                        INSERT OR REPLACE INTO parts 
+                        (part_number, name, manufacturer, price, installation_difficulty, 
+                         installation_time, symptoms, product_types, replacement_parts, 
+                         availability, video_url, product_url, data_type)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'csv_part')
+                    """, [
+                        part_number, name, manufacturer, price, installation_difficulty,
+                        installation_time, symptoms, product_types, replacement_parts,
+                        availability, video_url, product_url
+                    ])
+                
+                conn.commit()
+                logger.info(f"Successfully loaded {len(df)} CSV parts into database")
+                
+        except Exception as e:
+            logger.error(f"Error loading CSV data: {e}")
+            raise
 
 # Test the database
 if __name__ == "__main__":

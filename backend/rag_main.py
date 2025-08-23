@@ -16,6 +16,7 @@ backend_dir = Path(__file__).parent
 sys.path.append(str(backend_dir))
 
 import asyncio
+import json
 import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,7 +24,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import uuid
 
-from agents.optimized_rag_agent import OptimizedRAGOrchestrator
+from agents.rag_agent import RAGOrchestrator  # Change this import
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -66,9 +67,9 @@ async def startup_event():
     """Initialize the RAG orchestrator on startup"""
     global orchestrator
     try:
-        logger.info("Initializing RAG orchestrator...")
-        orchestrator = OptimizedRAGOrchestrator()
-        logger.info("PartSelect RAG orchestrator initialized successfully")
+        logger.info("Initializing RAG orchestrator with tool calling...")
+        orchestrator = RAGOrchestrator()  # Use RAG agent with tools
+        logger.info("PartSelect RAG orchestrator with tool calling initialized successfully")
         
         # Test database connection
         logger.info("Testing database connection...")
@@ -101,12 +102,13 @@ async def root():
         "message": "PartSelect AI Assistant API (RAG-powered)", 
         "status": "online",
         "version": "2.0.0",
-        "architecture": "RAG with real-time database queries",
+        "architecture": "RAG with AI-driven tool calling",
         "features": [
             "Real-time parts database queries",
             "Accurate pricing and availability",
             "Actual PartSelect URLs",
-            "Tool-based data retrieval",
+            "AI-driven tool calling",
+            "Dynamic data retrieval",
             "No hallucinated information"
         ]
     }
@@ -140,8 +142,14 @@ async def chat_endpoint(request: ChatRequest):
         
         logger.info(f"Processing message: {request.message[:100]}... (Thread: {thread_id})")
         
-        # Process the message with optimized RAG agent
+        # Process the message with RAG agent (now with tool calling)
         result = await orchestrator.process_query(request.message, thread_id)
+        
+        # Log the complete result
+        try:
+            logger.info(f"🔍 Complete result from orchestrator: {json.dumps(result, indent=2)}")
+        except:
+            logger.info(f"🔍 Complete result from orchestrator keys: {list(result.keys()) if result else 'None'}")
         
         # Get actual thread_id from result (may be created by orchestrator)
         actual_thread_id = result.get("thread_id", thread_id or str(uuid.uuid4()))
@@ -152,19 +160,24 @@ async def chat_endpoint(request: ChatRequest):
             for msg in result.get("conversation_history", [])
         ]
         
-        # Log cache efficiency info
-        stats = result.get("conversation_stats", {})
-        if stats:
-            logger.info(f"Conversation stats - Messages: {stats.get('total_messages', 0)}, "
-                       f"Cache efficiency: {stats.get('cache_efficiency', 'Unknown')}, "
-                       f"Estimated tokens: {stats.get('estimated_tokens', 0)}")
+        # Log tool usage info
+        tools_used = result.get("tools_used", [])
+        if tools_used:
+            logger.info(f"Tools used in this response: {tools_used}")
         
-        return ChatResponse(
-            response=result["response"],
-            thread_id=actual_thread_id,
-            conversation_history=conversation_history,
-            tools_used=[]  # No tools used in optimized approach
-        )
+        # Log what we're returning
+        response_data = {
+            "response": result["response"],
+            "thread_id": actual_thread_id,
+            "conversation_history": conversation_history,
+            "tools_used": tools_used
+        }
+        try:
+            logger.info(f"🚀 Returning to frontend: {json.dumps(response_data, indent=2)}")
+        except:
+            logger.info(f"🚀 Returning to frontend - response length: {len(result.get('response', ''))}")
+        
+        return ChatResponse(**response_data)
         
     except Exception as e:
         logger.error(f"Error in chat endpoint: {e}")
