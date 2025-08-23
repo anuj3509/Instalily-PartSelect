@@ -35,6 +35,12 @@ User Query → Query Analysis (LLM) → Data Retrieval → Response Generation (
             Query Type Routing      Smart Data Fusion     Real Data + URLs
 ```
 
+### Architecture Diagram
+
+![PartSelect RAG Architecture](partselect.png)
+
+*Complete system architecture showing the optimized RAG flow from user query to response generation*
+
 ### Detailed Architecture
 
 The system uses a **dual-database approach** with **2 LLM calls** for optimal performance:
