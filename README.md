@@ -80,7 +80,6 @@ Instalily-PartSelect/
 ├── frontend/          # React frontend application
 ├── scraping/          # Web scraping tools for data collection
 ├── requirements.txt   # Main project dependencies
-├── requirements-dev.txt # Development dependencies
 └── README.md         # This file
 ```
 
@@ -112,9 +111,6 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```bash
 # Install all Python dependencies
 pip install -r requirements.txt
-
-# Install development dependencies (optional)
-pip install -r requirements-dev.txt
 
 # Install frontend dependencies
 cd frontend
@@ -182,115 +178,4 @@ npm start
 
 # Frontend will open on http://localhost:3000
 ```
-
-### Alternative: Run Both Simultaneously
-
-```bash
-# Terminal 1: Backend
-cd backend && python rag_main.py
-
-# Terminal 2: Frontend  
-cd frontend && npm start
-```
-
-## Development Setup
-
-### Code Quality Tools
-
-```bash
-# Format code
-black backend/
-isort backend/
-
-# Lint code
-flake8 backend/
-mypy backend/
-
-# Run tests
-pytest backend/
-```
-
-### Pre-commit Hooks
-
-```bash
-# Install pre-commit hooks
-pre-commit install
-```
-
-## Testing the System
-
-### Sample Queries to Test
-
-1. **Part Search**: "I need a water filter for my refrigerator"
-2. **Troubleshooting**: "My dishwasher is leaking water"
-3. **Compatibility**: "What parts work with model GE GSS25GSHSS?"
-4. **Educational**: "How to clean a dishwasher filter"
-5. **Specific Part**: "How do I install part number PS11752778?"
-
-### Expected Responses
-
-- Real part numbers and prices
-- Actual PartSelect product URLs
-- Repair video links when available
-- Installation difficulty and time estimates
-- Brand and model compatibility information
-- Context-aware responses using conversation memory
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Database Connection Error**
-   ```bash
-   # Check if SQLite file exists
-   ls backend/database/partselect.db
-   
-   # Reinitialize database
-   python -c "from database.database_manager import PartSelectDatabase; db = PartSelectDatabase()"
-   ```
-
-2. **Vector Database Error**
-   ```bash
-   # Reinstall ChromaDB
-   pip uninstall chromadb && pip install chromadb
-   
-   # Recreate vector collections
-   python services/vector_store/setup.py
-   ```
-
-3. **API Key Issues**
-   ```bash
-   # Verify environment variables
-   echo $DEEPSEEK_API_KEY
-   echo $VOYAGE_API_KEY
-   ```
-
-4. **Frontend Connection Error**
-   ```bash
-   # Check backend is running on port 8080
-   curl http://127.0.0.1:8080/health
-   
-   # Verify frontend API configuration in src/api/api.js
-   ```
-
-5. **Import Errors**: Make sure you're in the correct virtual environment
-6. **Port Conflicts**: Change ports in uvicorn or npm start commands
-
-### Dependencies Issues
-
-- **ChromaDB**: May require specific Python version compatibility
-- **Playwright**: Requires browser installation (`playwright install`)
-- **SQLite**: Built-in to Python, no additional installation needed
-
-## Support
-
-For questions, issues, or contributions:
-
-- **Issues**: [GitHub Issues](https://github.com/anuj3509/Instalily-PartSelect/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/anuj3509/Instalily-PartSelect/discussions)
-- **Email**: [anujmpatel0000@gmail.com]
-
----
-
-**Note**: This project uses a dual-database approach with SQLite for fast queries and ChromaDB for semantic search, optimized for cost-effective AI responses with minimal LLM calls. The AI assistant leverages 7 specialized tools to provide accurate, real-time information about appliance parts, repairs, and troubleshooting.
 
