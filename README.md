@@ -37,16 +37,6 @@ The interface includes:
 
 ## System Architecture
 
-### High-Level Flow
-
-```
-User Query → Query Analysis (LLM) → Data Retrieval → Response Generation (LLM)
-                ↓                           ↓                    ↓
-            Intent Classification    SQLite + Vector DB    Structured Output
-                ↓                           ↓                    ↓
-            Query Type Routing      Smart Data Fusion     Real Data + URLs
-```
-
 ### Architecture Diagram
 
 ![PartSelect RAG Architecture](partselect.png)
