@@ -52,13 +52,25 @@ The system uses a **dual-database approach** with **2 LLM calls** for optimal pe
 3. **Vector Enhancement**: ChromaDB semantic search when additional context needed
 4. **Response Generation (LLM Call 2)**: Single LLM call with complete context
 
-**Core Component**: `OptimizedRAGOrchestrator` - Main orchestrator that manages the entire RAG process
+**Core Component**: `RAGOrchestrator` - Main orchestrator that manages the entire RAG process
+
+### Agent Tools
+
+The AI assistant has access to **7 specialized tools** for comprehensive assistance:
+
+1. **`search_parts`** - Search for appliance parts with filters (brand, category, price, stock)
+2. **`get_part_details`** - Get detailed part information by part number (PRIMARY tool for specific parts)
+3. **`search_compatible_parts`** - Find parts compatible with appliance models
+4. **`search_repair_guides`** - Search troubleshooting and repair guides by symptom
+5. **`search_blog_content`** - Search educational blog articles and maintenance tips
+6. **`get_available_brands`** - Get list of available brands in the database
+7. **`get_price_range`** - Get price ranges for part categories
 
 ### Database Architecture
 
 - **Primary Database**: SQLite + FTS5 for fast, structured queries
 - **Vector Database**: ChromaDB with Voyage AI embeddings for semantic search
-- **Data Sources**: 10,000+ parts, 50+ repair guides, 200+ blog articles
+- **Data Sources**: 13,584+ parts, 21+ repair guides, 219+ blog articles
 
 ## Project Structure
 
@@ -213,6 +225,7 @@ pre-commit install
 2. **Troubleshooting**: "My dishwasher is leaking water"
 3. **Compatibility**: "What parts work with model GE GSS25GSHSS?"
 4. **Educational**: "How to clean a dishwasher filter"
+5. **Specific Part**: "How do I install part number PS11752778?"
 
 ### Expected Responses
 
@@ -221,6 +234,7 @@ pre-commit install
 - Repair video links when available
 - Installation difficulty and time estimates
 - Brand and model compatibility information
+- Context-aware responses using conversation memory
 
 ## Troubleshooting
 
@@ -278,5 +292,5 @@ For questions, issues, or contributions:
 
 ---
 
-**Note**: This project uses a dual-database approach with SQLite for fast queries and ChromaDB for semantic search, optimized for cost-effective AI responses with minimal LLM calls.
+**Note**: This project uses a dual-database approach with SQLite for fast queries and ChromaDB for semantic search, optimized for cost-effective AI responses with minimal LLM calls. The AI assistant leverages 7 specialized tools to provide accurate, real-time information about appliance parts, repairs, and troubleshooting.
 
